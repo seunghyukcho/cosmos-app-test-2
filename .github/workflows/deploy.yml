@@ -13,9 +13,11 @@ jobs:
       - run: npm install
       - run: npx vite build
       - uses: oras-project/setup-oras@v1
-      - name: Push to OCI Registry
+      - name: Login to OCI Registry
         run: |
-          REGISTRY_HOST=$(echo "${{ secrets.OCI_REGISTRY_URL }}" | cut -d'/' -f1)
-          echo "${{ secrets.OCI_PASSWORD }}" | oras login "$REGISTRY_HOST" -u ${{ secrets.OCI_USERNAME }} --password-stdin
+          REGISTRY_HOST=$(echo "${{ secrets.OCI_REGISTRY_URL }}" | cut -d'/'-f1)
+          printf '%s' "${{ secrets.OCI_PASSWORD }}" | oras login "$REGISTRY_HOST" -u "${{ secrets.OCI_USERNAME }}" --password-stdin
+      - name: Push artifacts
+        run: |
           cd dist
-          oras push ${{ secrets.OCI_REGISTRY_URL }}/app_d4347e7d9867:${{ github.ref_name }} .
+          oras push "${{ secrets.OCI_REGISTRY_URL }}/app_d4347e7d9867:${{ github.ref_name }}" .
