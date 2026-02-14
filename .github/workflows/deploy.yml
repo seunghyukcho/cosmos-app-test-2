@@ -15,6 +15,7 @@ jobs:
       - uses: oras-project/setup-oras@v1
       - name: Push to OCI Registry
         run: |
-          echo "${{ secrets.OCI_PASSWORD }}" | oras login ${{ secrets.OCI_REGISTRY_URL }} -u ${{ secrets.OCI_USERNAME }} --password-stdin
+          REGISTRY_HOST=$(echo "${{ secrets.OCI_REGISTRY_URL }}" | cut -d'/' -f1)
+          echo "${{ secrets.OCI_PASSWORD }}" | oras login "$REGISTRY_HOST" -u ${{ secrets.OCI_USERNAME }} --password-stdin
           cd dist
           oras push ${{ secrets.OCI_REGISTRY_URL }}/app_d4347e7d9867:${{ github.ref_name }} .
